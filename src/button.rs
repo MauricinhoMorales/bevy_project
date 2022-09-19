@@ -1,6 +1,7 @@
-use crate::font::MediumFont;
+use crate::resources::MediumFont;
 use bevy::prelude::*;
 
+//Define a specific color for each one of the button states
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
@@ -8,6 +9,7 @@ const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
 #[derive(Component)]
 struct Panel;
 
+//Function to verify the state of a button and change accordingly
 fn button_system(
     mut interaction_query: Query<
         (&Interaction, &mut UiColor, &Children),
@@ -72,7 +74,7 @@ fn setup_button(mut commands: Commands, font: Res<MediumFont>) {
             style: Style {
                 size: Size::new(Val::Px(150.0), Val::Px(65.0)),
                 // center button
-                margin: Rect::all(Val::Auto),
+                margin: UiRect::all(Val::Auto),
                 // horizontally center child text
                 justify_content: JustifyContent::Center,
                 // vertically center child text
@@ -82,16 +84,16 @@ fn setup_button(mut commands: Commands, font: Res<MediumFont>) {
             color: NORMAL_BUTTON.into(),
             ..default()
         })
+        .insert(Name::new("Button"))
         .with_children(|parent| {
             parent.spawn_bundle(TextBundle {
-                text: Text::with_section(
+                text: Text::from_section(
                     "Button",
                     TextStyle {
                         font: font.0.clone(),
                         font_size: 40.0,
                         color: Color::rgb(0.9, 0.9, 0.9),
-                    },
-                    Default::default(),
+                    }
                 ),
                 ..default()
             });
@@ -103,7 +105,7 @@ fn spawn_panel_2d(mut commands: Commands, font: Res<MediumFont>) {
         .spawn_bundle(NodeBundle {
             style: Style {
                 size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                margin: Rect::all(Val::Auto),
+                margin: UiRect::all(Val::Auto),
                 // horizontally center child text
                 justify_content: JustifyContent::Center,
                 // vertically center child text
@@ -113,18 +115,18 @@ fn spawn_panel_2d(mut commands: Commands, font: Res<MediumFont>) {
             color: Color::WHITE.into(),
             ..Default::default()
         })
+        .insert(Name::new("Panel"))
         .insert(Interaction::None)
         .insert(Panel)
         .with_children(|p| {
             p.spawn_bundle(TextBundle {
-                text: Text::with_section(
+                text: Text::from_section(
                     "Panel",
                     TextStyle {
                         font: font.0.clone(),
                         font_size: 40.0,
                         color: Color::rgb(0.9, 0.9, 0.9),
                     },
-                    Default::default(),
                 ),
                 ..default()
             });

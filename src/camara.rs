@@ -1,6 +1,6 @@
 use bevy::input::mouse::{MouseMotion, MouseWheel};
 use bevy::prelude::*;
-use bevy::render::camera::PerspectiveProjection;
+use bevy::render::camera::Projection;
 use bevy_flycam::PlayerPlugin;
 
 use bevy_mod_picking::PickingCameraBundle;
@@ -30,7 +30,7 @@ fn pan_orbit_camera(
     mut ev_motion: EventReader<MouseMotion>,
     mut ev_scroll: EventReader<MouseWheel>,
     input_mouse: Res<Input<MouseButton>>,
-    mut query: Query<(&mut PanOrbitCamera, &mut Transform, &PerspectiveProjection)>,
+    mut query: Query<(&mut PanOrbitCamera, &mut Transform, &Projection)>,
 ) {
     // change input mapping for orbit and panning here
     let orbit_button = MouseButton::Right;
@@ -87,7 +87,10 @@ fn pan_orbit_camera(
             any = true;
             // make panning distance independent of resolution and FOV,
             let window = get_primary_window_size(&windows);
-            pan *= Vec2::new(projection.fov * projection.aspect_ratio, projection.fov) / window;
+            if let Projection::Perspective(projection) = projection {
+                pan *= Vec2::new(projection.fov * projection.aspect_ratio, projection.fov) / window;
+            }
+            // translate by local axes
             // translate by local axes
             let right = transform.rotation * Vec3::X * -pan.x;
             let up = transform.rotation * Vec3::Y * pan.y;
@@ -112,19 +115,20 @@ fn pan_orbit_camera(
     }
 }
 
+// Define the window size
 fn get_primary_window_size(windows: &Res<Windows>) -> Vec2 {
     let window = windows.get_primary().unwrap();
     let window = Vec2::new(window.width() as f32, window.height() as f32);
     window
 }
 
-/// Spawn a camera like this
+/// Spawn a camera
 pub fn spawn_pan_orbit_camera(mut commands: Commands) {
     let translation = Vec3::new(0.0, 3.0, 25.0);
     let radius = translation.length();
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform: Transform::from_translation(translation).looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         })
@@ -132,22 +136,41 @@ pub fn spawn_pan_orbit_camera(mut commands: Commands) {
             radius,
             ..Default::default()
         })
+        .insert(Name::new("PanOrbitCamera"))
         .insert_bundle(PickingCameraBundle::default());
+}
+
+pub fn show_info_fly_camara() {
+    info!("Move camera around by using WASD for lateral movement");
+    info!("Use Left Shift and Spacebar for vertical movement");
+    info!("Use the mouse to look around");
+    info!("Press Esc to hide or show the mouse cursor");
+}
+
+/// Pan the camera with middle mouse click, zoom with scroll wheel, orbit with right mouse click.
+pub fn show_info_pan_orbit_camara() {
+    info!("Pan the camera with middle mouse click");
+    info!("Zoom with scroll wheel");
+    info!("Orbit with right mouse click");
 }
 
 pub struct PanOrbitCamaraPlugin;
 
+//Plugin to start a PanOrbitCamara to manage the window
 impl Plugin for PanOrbitCamaraPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_pan_orbit_camera)
+            .add_startup_system(show_info_pan_orbit_camara)
             .add_system(pan_orbit_camera);
     }
 }
 
 pub struct FlyCamaraPlugin;
 
+//Plugin to start a FlyCamara to manage the window
 impl Plugin for FlyCamaraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(PlayerPlugin);
+        app.add_plugin(PlayerPlugin)
+        .add_startup_system(show_info_fly_camara);
     }
 }
