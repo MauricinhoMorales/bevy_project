@@ -5,15 +5,13 @@ use bevy_mod_picking::{
     InteractablePickingPlugin,
     PickableBundle,
     PickingPlugin,
-    DebugCursorPickingPlugin,
+    // DebugCursorPickingPlugin,
 };
-use std::f32::consts::PI;
-use crate::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, Y_SEPARATION, X_SEPARATION}, resources::{MyAssets, MyActions}};
-const FULL_TURN: f32 = 2.0 * PI;
+use crate::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, Y_SEPARATION, X_SEPARATION,FULL_TURN}, resources::{MyAssets, MyActions}};
 
 // Define a component to designate a rotation speed to an entity.
 #[derive(Component)]
-struct Rotatable {
+pub struct Rotatable {
     speed: f32,
     status: bool,
 }

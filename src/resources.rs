@@ -5,7 +5,8 @@ pub struct BoldFont(pub Handle<Font>);
 
 pub struct MyAssets {
     pub ipfs: Handle<Scene>,
-    pub sf: Handle<Scene>
+    pub sf: Handle<Scene>,
+    pub car: Handle<Scene>
 }
 
 pub struct MyButtons {
@@ -15,7 +16,8 @@ pub struct MyButtons {
 }
 
 pub struct MyActions {
-    pub rotate: bool
+    pub rotate: bool,
+    pub motion: bool
 }
 
 // Importing Medium Font
@@ -47,6 +49,7 @@ fn asset_loading(mut commands: Commands, server: Res<AssetServer>){
         MyAssets{
             ipfs: server.load("models/Logo_IPFS.gltf#Scene0"),
             sf: server.load("models/Logo_SugarFunge.gltf#Scene0"),
+            car: server.load("car-models/ambulance.glb#Scene0")
         }
     );
 }
@@ -65,6 +68,7 @@ fn actions_loading(mut commands: Commands){
     commands.insert_resource(
         MyActions{
             rotate: false,
+            motion: false
         }
     );
 }

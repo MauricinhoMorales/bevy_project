@@ -12,6 +12,7 @@ mod picking;
 mod text;
 mod window;
 mod constants;
+mod cars;
 
 fn main() {
     App::new()
@@ -31,6 +32,7 @@ fn main() {
         .add_plugin(camara::PanOrbitCamaraPlugin)
         .add_plugin(assets::Scene2Plugin)
         .add_plugin(assets::RotationPlugin)
+        .add_plugin(cars::CarPlugin)
         .add_plugin(WorldInspectorPlugin::new())
         .run();
 }
