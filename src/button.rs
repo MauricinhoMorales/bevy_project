@@ -1,4 +1,4 @@
-use crate::resources::MediumFont;
+use crate::resources::{MediumFont, MyButtons, MyActions};
 use bevy::prelude::*;
 
 //Define a specific color for each one of the button states
@@ -39,6 +39,35 @@ fn button_system(
     }
 }
 
+fn icon_button_system(
+    mut interaction_query: Query<
+        (&Interaction, &mut UiImage),
+        (Changed<Interaction>, With<Button>),
+    >,
+    buttons: Res<MyButtons>,
+    mut actions: ResMut<MyActions>
+) {
+    for (interaction, mut image) in interaction_query.iter_mut() {
+        match *interaction {
+            Interaction::Clicked => {
+                actions.rotate = !actions.rotate;
+                if actions.rotate{
+                    *image = UiImage(buttons.pause.clone());
+                } else {
+                    *image = UiImage(buttons.play.clone());
+                }
+                info!("Pressed Button");
+            }
+            Interaction::Hovered => {
+                info!("Hovered Button");
+            }
+            Interaction::None => {
+                info!("None Button");
+            }
+        }
+    }
+}
+
 fn panel_system(
     mut interaction_query: Query<
         (&Interaction, &mut UiColor, &Children),
@@ -68,13 +97,35 @@ fn panel_system(
     }
 }
 
-fn setup_button(mut commands: Commands, font: Res<MediumFont>) {
+fn spawn_button_image(mut commands: Commands, button: Res<MyButtons>) {
     commands
         .spawn_bundle(ButtonBundle {
             style: Style {
+                position_type: PositionType::Absolute,
+                position: UiRect {                    
+                    bottom: Val::Px(15.0),
+                    right: Val::Px(15.0),
+                    ..default()},
+                size: Size::new(Val::Px(80.0), Val::Px(80.0)),
+                ..default()
+            },
+            image: UiImage(button.play.clone()),
+            ..default() 
+        }).insert(Name::new("Icon Button"));
+}
+
+fn spawn_button(mut commands: Commands, font: Res<MediumFont>) {
+    commands
+        .spawn_bundle(ButtonBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                position: UiRect {                    
+                    bottom: Val::Px(15.0),
+                    right: Val::Px(15.0),
+                    ..default()},
                 size: Size::new(Val::Px(150.0), Val::Px(65.0)),
                 // center button
-                margin: UiRect::all(Val::Auto),
+                margin: UiRect::all(Val::Px(10.0)),
                 // horizontally center child text
                 justify_content: JustifyContent::Center,
                 // vertically center child text
@@ -82,7 +133,7 @@ fn setup_button(mut commands: Commands, font: Res<MediumFont>) {
                 ..default()
             },
             color: NORMAL_BUTTON.into(),
-            ..default()
+            ..default() 
         })
         .insert(Name::new("Button"))
         .with_children(|parent| {
@@ -104,8 +155,14 @@ fn spawn_panel_2d(mut commands: Commands, font: Res<MediumFont>) {
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
+                position_type: PositionType::Absolute,
+                position: UiRect {                    
+                    bottom: Val::Px(15.0),
+                    left: Val::Px(15.0),
+                    ..default()},
+                align_self: AlignSelf::FlexStart,
                 size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                margin: UiRect::all(Val::Auto),
+                margin: UiRect::all(Val::Px(10.0)),
                 // horizontally center child text
                 justify_content: JustifyContent::Center,
                 // vertically center child text
@@ -137,9 +194,9 @@ pub struct ButtonPlugin;
 
 impl Plugin for ButtonPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup_button)
+        app.add_startup_system(spawn_button_image)
             .add_startup_system(spawn_panel_2d)
-            .add_system(panel_system)
-            .add_system(button_system);
+            .add_system(icon_button_system)
+            .add_system(panel_system);
     }
 }

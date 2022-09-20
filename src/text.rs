@@ -18,7 +18,7 @@ fn setup_txt(mut commands: Commands, medium_font: Res<MediumFont>, bold_font: Re
                 align_self: AlignSelf::FlexEnd,
                 position_type: PositionType::Absolute,
                 position: UiRect {                    
-                    bottom: Val::Px(5.0),
+                    bottom: Val::Px(100.0),
                     right: Val::Px(15.0),
                     ..default()},
                 ..default()
@@ -29,7 +29,7 @@ fn setup_txt(mut commands: Commands, medium_font: Res<MediumFont>, bold_font: Re
                 "hello\nbevy!",
                 TextStyle {
                     font: bold_font.0.clone(),
-                    font_size: 20.0,
+                    font_size: 60.0,
                     color: Color::WHITE,
                 },
             ).with_alignment(TextAlignment::CENTER),
@@ -57,7 +57,7 @@ fn setup_txt(mut commands: Commands, medium_font: Res<MediumFont>, bold_font: Re
                         },
                     },
                     TextSection {
-                        value: "".to_string(),
+                        value: "60".to_string(),
                         style: TextStyle {
                             font: medium_font.0.clone(),
                             font_size: 20.0,

@@ -8,7 +8,7 @@ use bevy_mod_picking::{
     DebugCursorPickingPlugin,
 };
 use std::f32::consts::PI;
-use crate::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, Y_SEPARATION, X_SEPARATION}, resources::MyAssets};
+use crate::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, Y_SEPARATION, X_SEPARATION}, resources::{MyAssets, MyActions}};
 const FULL_TURN: f32 = 2.0 * PI;
 
 // Define a component to designate a rotation speed to an entity.
@@ -142,14 +142,16 @@ pub fn spawn_gltf(mut commands: Commands, assets: Res<MyAssets>) {
 }
 
 // This system will rotate any entity in the scene with an assigned Rotatable around its z-axis.
-fn rotate_items(mut cubes: Query<(&mut Transform, &Rotatable)>, timer: Res<Time>) {
+fn rotate_items(mut cubes: Query<(&mut Transform, &Rotatable)>, timer: Res<Time>, actions: Res<MyActions>) {
     for (mut transform, cube) in cubes.iter_mut() {
         // The speed is taken as a percentage of a full 360 degree turn.
         // The timers delta_seconds is used to smooth out the movement.
-        if cube.status {
-            let rotation_change =
-                Quat::from_rotation_y(FULL_TURN * cube.speed * timer.delta_seconds());
-            transform.rotate(rotation_change);
+        if actions.rotate{
+            if cube.status {
+                let rotation_change =
+                    Quat::from_rotation_y(FULL_TURN * cube.speed * timer.delta_seconds());
+                transform.rotate(rotation_change);
+            }
         }
     }
 }
@@ -172,7 +174,7 @@ impl Plugin for Scene2Plugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(TextMeshPlugin)
             .add_plugin(PickingPlugin)
-            .add_plugin(DebugCursorPickingPlugin) // <- Adds the green debug cursor.
+            // .add_plugin(DebugCursorPickingPlugin) // <- Adds the green debug cursor.
             .add_plugin(InteractablePickingPlugin)
             .add_plugin(DebugEventsPickingPlugin)
             .add_startup_system(spawn_plain)
