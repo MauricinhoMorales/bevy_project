@@ -10,7 +10,8 @@ use bevy_mod_picking::{
 use crate::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, Y_SEPARATION, X_SEPARATION,FULL_TURN}, resources::{MyAssets, MyActions}};
 
 // Define a component to designate a rotation speed to an entity.
-#[derive(Component)]
+#[derive(Reflect, Component, Default)]
+#[reflect(Component)]
 pub struct Rotatable {
     speed: f32,
     status: bool,

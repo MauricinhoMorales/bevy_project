@@ -1,7 +1,10 @@
 use bevy::prelude::Color;
 use std::f32::consts::PI;
-
 pub const FULL_TURN: f32 = 2.0 * PI;
+
+//Define the dimensions of the main window
+pub const HEIGHT: f32 = 600.0;
+pub const WIDTH: f32 = 1200.0;
 
 // Define the specific space between some entities
 pub const Y_DEFAULT: f32 = 0.0;

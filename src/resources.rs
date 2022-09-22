@@ -1,7 +1,11 @@
-use bevy::{prelude::*, app::PluginGroupBuilder};
+use bevy::{
+    prelude::*, 
+};
 
-pub struct MediumFont(pub Handle<Font>);
-pub struct BoldFont(pub Handle<Font>);
+pub struct MyFonts{
+    pub medium: Handle<Font>,
+    // pub bold: Handle<Font>
+}
 
 pub struct MyAssets {
     pub ipfs: Handle<Scene>,
@@ -20,27 +24,18 @@ pub struct MyActions {
     pub motion: bool
 }
 
-// Importing Medium Font
-impl FromWorld for MediumFont {
+impl FromWorld for MyFonts {
     fn from_world(world: &mut World) -> Self {
-        MediumFont(
-            world
+        MyFonts{
+            medium: world
                 .get_resource::<AssetServer>()
                 .unwrap()
                 .load("fonts/FiraMono-Medium.ttf"),
-        )
-    }
-}
-
-// Importing Bold Font
-impl FromWorld for BoldFont {
-    fn from_world(world: &mut World) -> Self {
-        BoldFont(
-            world
-                .get_resource::<AssetServer>()
-                .unwrap()
-                .load("fonts/FiraSans-Bold.ttf"),
-        )
+            // bold: world
+            //     .get_resource::<AssetServer>()
+            //     .unwrap()
+            //     .load("fonts/FiraSans-Bold.ttf"),
+        }
     }
 }
 
@@ -49,7 +44,7 @@ fn asset_loading(mut commands: Commands, server: Res<AssetServer>){
         MyAssets{
             ipfs: server.load("models/Logo_IPFS.gltf#Scene0"),
             sf: server.load("models/Logo_SugarFunge.gltf#Scene0"),
-            car: server.load("car-models/ambulance.glb#Scene0")
+            car: server.load("car-models/race.glb#Scene0")
         }
     );
 }
@@ -73,36 +68,21 @@ fn actions_loading(mut commands: Commands){
     );
 }
 
-pub struct MediumFontPlugin;
-
-//Plugin to initialize different types of fonts
-impl Plugin for MediumFontPlugin {
-    fn build(&self, app: &mut App) {
-        app.init_resource::<MediumFont>();
-    }
-}
-
-pub struct BoldFontPlugin;
-
-impl Plugin for BoldFontPlugin {
-    fn build(&self, app: &mut App) {
-        app.init_resource::<BoldFont>();
-    }
-}
-
 pub struct FontPlugin;
 
-impl PluginGroup for FontPlugin {
-    fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(MediumFontPlugin).add(BoldFontPlugin);
+impl Plugin for FontPlugin {
+    fn build(&self, app: &mut App) {
+        app.init_resource::<MyFonts>();
     }
 }
 
-pub struct AssetPlugin;
 
-impl Plugin for AssetPlugin{
+pub struct ResourcesPlugin;
+
+impl Plugin for ResourcesPlugin{
     fn build(&self, app: &mut App) {
-        app.add_startup_system_to_stage(StartupStage::PreStartup,asset_loading)
+        app
+        .add_startup_system_to_stage(StartupStage::PreStartup,asset_loading)
         .add_startup_system_to_stage(StartupStage::PreStartup,button_loading)
         .add_startup_system_to_stage(StartupStage::PreStartup,actions_loading);
     }

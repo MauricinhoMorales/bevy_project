@@ -1,4 +1,4 @@
-use crate::{resources::{MediumFont, MyButtons, MyActions}, constants::*};
+use crate::{resources::{MyFonts, MyButtons, MyActions}, constants::*};
 use bevy::prelude::*;
 
 #[derive(Component)]
@@ -147,7 +147,7 @@ fn spawn_button_image(mut commands: Commands, button: Res<MyButtons>) {
 //         });
 // }
 
-fn spawn_panel_2d(mut commands: Commands, font: Res<MediumFont>) {
+fn spawn_panel_2d(mut commands: Commands, fonts: Res<MyFonts>) {
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
@@ -176,7 +176,7 @@ fn spawn_panel_2d(mut commands: Commands, font: Res<MediumFont>) {
                 text: Text::from_section(
                     "Panel",
                     TextStyle {
-                        font: font.0.clone(),
+                        font: fonts.medium.clone(),
                         font_size: 40.0,
                         color: Color::rgb(0.9, 0.9, 0.9),
                     },

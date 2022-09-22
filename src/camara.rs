@@ -6,7 +6,8 @@ use bevy_flycam::PlayerPlugin;
 use bevy_mod_picking::PickingCameraBundle;
 
 /// Tags an entity as capable of panning and orbiting.
-#[derive(Component)]
+#[derive(Reflect, Component)]
+#[reflect(Component)]
 struct PanOrbitCamera {
     /// The "focus point" to orbit around. It is automatically updated when panning the camera
     pub focus: Vec3,

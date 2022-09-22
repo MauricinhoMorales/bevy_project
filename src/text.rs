@@ -1,16 +1,18 @@
-use crate::resources::{BoldFont, MediumFont};
+use crate::resources::MyFonts;
 use bevy::prelude::*;
 
 // A unit struct to help identify the FPS UI component, since there may be many Text components
-#[derive(Component)]
+#[derive(Reflect, Component, Default)]
+#[reflect(Component)]
 struct FpsText;
 
 // A unit struct to help identify the color-changing Text component
-#[derive(Component)]
+#[derive(Reflect, Component, Default)]
+#[reflect(Component)]
 struct ColorText;
 
 // Create an example with two different types of text 
-fn setup_txt(mut commands: Commands, medium_font: Res<MediumFont>, bold_font: Res<BoldFont>) {
+fn setup_txt(mut commands: Commands, server: Res<AssetServer>, fonts: Res<MyFonts>) {
     // Create a TextBundle and added a ColorText type
     commands
         .spawn_bundle(TextBundle {
@@ -28,7 +30,7 @@ fn setup_txt(mut commands: Commands, medium_font: Res<MediumFont>, bold_font: Re
                 // Accepts a `String` or any type that converts into a `String`, such as `&str`
                 "hello\nbevy!",
                 TextStyle {
-                    font: bold_font.0.clone(),
+                    font: server.load("fonts/FiraSans-Bold.ttf"),
                     font_size: 60.0,
                     color: Color::WHITE,
                 },
@@ -51,7 +53,7 @@ fn setup_txt(mut commands: Commands, medium_font: Res<MediumFont>, bold_font: Re
                     TextSection {
                         value: "FPS: ".to_string(),
                         style: TextStyle {
-                            font: medium_font.0.clone(),
+                            font: fonts.medium.clone(),
                             font_size: 20.0,
                             color: Color::WHITE,
                         },
@@ -59,7 +61,7 @@ fn setup_txt(mut commands: Commands, medium_font: Res<MediumFont>, bold_font: Re
                     TextSection {
                         value: "60".to_string(),
                         style: TextStyle {
-                            font: medium_font.0.clone(),
+                            font: fonts.medium.clone(),
                             font_size: 20.0,
                             color: Color::GOLD,
                         },
@@ -78,6 +80,6 @@ pub struct TextPlugin;
 //Plugin to be able to show the texts in 2D
 impl Plugin for TextPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup_txt);
+        app.add_startup_system_to_stage(StartupStage::PostStartup,setup_txt);
     }
 }

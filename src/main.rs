@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
-
-pub const HEIGHT: f32 = 600.0;
-pub const WIDTH: f32 = 1200.0;
+use constants::{HEIGHT,WIDTH};
 
 mod assets;
 mod button;
@@ -23,9 +21,9 @@ fn main() {
             resizable: true,
             ..default()
         })
-        .add_plugin(resources::AssetPlugin)
+        .add_plugin(resources::ResourcesPlugin)
         .add_plugins(DefaultPlugins)
-        .add_plugins(resources::FontPlugin)
+        .add_plugin(resources::FontPlugin)
         // .add_plugin(window::WindowPlugin)
         .add_plugin(button::ButtonPlugin)
         .add_plugin(text::TextPlugin)
