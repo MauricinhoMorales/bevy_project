@@ -5,6 +5,10 @@ use bevy_flycam::PlayerPlugin;
 
 use bevy_mod_picking::PickingCameraBundle;
 
+use crate::tools::generics::despawn;
+use crate::views::GameState;
+use crate::views::game::GameItem;
+
 /// Tags an entity as capable of panning and orbiting.
 #[derive(Reflect, Component)]
 #[reflect(Component)]
@@ -138,6 +142,7 @@ pub fn spawn_pan_orbit_camera(mut commands: Commands) {
             ..Default::default()
         })
         .insert(Name::new("PanOrbitCamera"))
+        .insert(GameItem)
         .insert_bundle(PickingCameraBundle::default());
 }
 
@@ -160,9 +165,13 @@ pub struct PanOrbitCamaraPlugin;
 //Plugin to start a PanOrbitCamara to manage the window
 impl Plugin for PanOrbitCamaraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_pan_orbit_camera)
-            .add_startup_system(show_info_pan_orbit_camara)
-            .add_system(pan_orbit_camera);
+        app.add_system_set(SystemSet::on_enter(GameState::Game)
+                .with_system(spawn_pan_orbit_camera)
+                .with_system(show_info_pan_orbit_camara))
+            .add_system_set(SystemSet::on_update(GameState::Game)
+                .with_system(pan_orbit_camera))
+            .add_system_set(SystemSet::on_exit(GameState::Game)
+                .with_system(despawn::<GameItem>));
     }
 }
 

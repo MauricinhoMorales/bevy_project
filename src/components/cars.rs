@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, X_SEPARATION, FULL_TURN}, resources::{MyAssets, MyActions}};
+use crate::{tools::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, X_SEPARATION, FULL_TURN},resources::{MyAssets, MyActions}, generics::despawn}, views::{GameState, game::GameItem}};
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
@@ -32,6 +32,7 @@ pub fn spawn_car(mut commands: Commands, assets: Res<MyAssets>) {
         ..Default::default()
     })
     .insert(Name::new("Car"))
+    .insert(GameItem)
     .insert(Car{
         speed: 5.0,
         rotation_speed: 0.1,
@@ -85,6 +86,7 @@ fn car_interactions(
                                         ..Default::default()
                                     })
                                     .insert(Name::new("Bullet"))
+                                    .insert(GameItem)
                                     .insert(Bullet{
                                     direction: local_z
                                     })
@@ -145,9 +147,13 @@ pub struct CarPlugin;
 //Plugin to create a more complex Scene
 impl Plugin for CarPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_car)
-            .add_system(car_interactions)
-            .add_system(bullet_interactions)
-            .add_system(bullet_despawn);
+        app.add_system_set(SystemSet::on_enter(GameState::Game)
+                .with_system(spawn_car))
+            .add_system_set(SystemSet::on_update(GameState::Game)
+                .with_system(car_interactions)
+                .with_system(bullet_interactions)
+                .with_system(bullet_despawn))
+            .add_system_set(SystemSet::on_exit(GameState::Game)
+                .with_system(despawn::<GameItem>));
     }
 }

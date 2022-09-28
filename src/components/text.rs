@@ -1,4 +1,4 @@
-use crate::resources::MyFonts;
+use crate::{tools::{resources::MyFonts, generics::despawn}, views::{GameState, game::GameItem}};
 use bevy::prelude::*;
 
 // A unit struct to help identify the FPS UI component, since there may be many Text components
@@ -38,6 +38,7 @@ fn setup_txt(mut commands: Commands, server: Res<AssetServer>, fonts: Res<MyFont
             ..default()
         })
         .insert(Name::new("Text 1"))
+        .insert(GameItem)
         .insert(ColorText);
     // Create a TextBundle and added a FPSText type
     commands
@@ -72,6 +73,7 @@ fn setup_txt(mut commands: Commands, server: Res<AssetServer>, fonts: Res<MyFont
             ..default()
         })
         .insert(Name::new("Text 2"))
+        .insert(GameItem)
         .insert(FpsText);
 }
 
@@ -80,6 +82,9 @@ pub struct TextPlugin;
 //Plugin to be able to show the texts in 2D
 impl Plugin for TextPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system_to_stage(StartupStage::PostStartup,setup_txt);
+        app.add_system_set(SystemSet::on_enter(GameState::Game)
+                .with_system(setup_txt))
+            .add_system_set(SystemSet::on_exit(GameState::Game)
+                .with_system(despawn::<GameItem>));
     }
 }

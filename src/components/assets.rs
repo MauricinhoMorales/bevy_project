@@ -7,7 +7,14 @@ use bevy_mod_picking::{
     PickingPlugin,
     // DebugCursorPickingPlugin,
 };
-use crate::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, Y_SEPARATION, X_SEPARATION,FULL_TURN}, resources::{MyAssets, MyActions}};
+use crate::{
+    tools::{
+        constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, Y_SEPARATION, X_SEPARATION,FULL_TURN}, 
+        resources::{MyAssets, MyActions}, generics::despawn},
+    views::{
+        GameState, 
+        game::GameItem}
+};
 
 // Define a component to designate a rotation speed to an entity.
 #[derive(Reflect, Component, Default)]
@@ -27,7 +34,8 @@ fn spawn_light(mut commands: Commands) {
         },
         ..Default::default()
     })
-    .insert(Name::new("Simple Light"));
+    .insert(Name::new("Simple Light"))
+    .insert(GameItem);
 }
 
 // Spawn a Large Light
@@ -45,7 +53,8 @@ fn spawn_directional_light(mut commands: Commands) {
         },
         ..default()
     })
-    .insert(Name::new("Directional Light"));
+    .insert(Name::new("Directional Light"))
+    .insert(GameItem);
 }
 
 // Spawn a Plain for testing
@@ -62,6 +71,7 @@ fn spawn_plain(
             ..Default::default()
         })
         .insert(Name::new("Plain"))
+        .insert(GameItem)
         .insert_bundle(PickableBundle::default());
 }
 
@@ -79,6 +89,7 @@ fn spawn_cube(
             ..Default::default()
         })
         .insert(Name::new("Cube"))
+        .insert(GameItem)
         .insert_bundle(PickableBundle::default());
 }
 
@@ -97,6 +108,7 @@ fn spawn_rotatable_cube(
             ..Default::default()
         })
         .insert(Name::new("Rotatable Cube"))
+        .insert(GameItem)
         .insert_bundle(PickableBundle::default())
         .insert(Rotatable {
             speed: 0.3,
@@ -114,6 +126,7 @@ fn spawn_text(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..Default::default()
         })
         .insert(Name::new("Text3D"))
+        .insert(GameItem)
         .insert_bundle(PickableBundle::default());
 }
 
@@ -125,6 +138,7 @@ pub fn spawn_gltf(mut commands: Commands, assets: Res<MyAssets>) {
         ..Default::default()
     })
     .insert(Name::new("Icon IPFS"))
+    .insert(GameItem)
     .insert(Rotatable {
         speed: 0.3,
         status: true,
@@ -137,6 +151,7 @@ pub fn spawn_gltf(mut commands: Commands, assets: Res<MyAssets>) {
         ..Default::default()
     })
     .insert(Name::new("Icon Sugarfunge"))
+    .insert(GameItem)
     .insert_bundle(PickableBundle::default());
 }
 
@@ -160,9 +175,12 @@ pub struct Scene1Plugin;
 //Plugin to create a Simple Scene
 impl Plugin for Scene1Plugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_cube)
-            .add_startup_system(spawn_light)
-            .add_startup_system(spawn_plain);
+        app.add_system_set(SystemSet::on_enter(GameState::Game)
+                .with_system(spawn_cube)
+                .with_system(spawn_light)
+                .with_system(spawn_plain))
+            .add_system_set(SystemSet::on_exit(GameState::Game)
+                .with_system(despawn::<GameItem>));
     }
 }
 
@@ -176,11 +194,14 @@ impl Plugin for Scene2Plugin {
             // .add_plugin(DebugCursorPickingPlugin) // <- Adds the green debug cursor.
             .add_plugin(InteractablePickingPlugin)
             .add_plugin(DebugEventsPickingPlugin)
-            .add_startup_system(spawn_plain)
-            .add_startup_system(spawn_directional_light)
-            .add_startup_system(spawn_gltf)
-            .add_startup_system(spawn_cube)
-            .add_startup_system(spawn_text);
+            .add_system_set(SystemSet::on_enter(GameState::Game)
+                .with_system(spawn_plain)
+                .with_system(spawn_directional_light)
+                .with_system(spawn_gltf)
+                .with_system(spawn_cube)
+                .with_system(spawn_text))
+            .add_system_set(SystemSet::on_exit(GameState::Game)
+                .with_system(despawn::<GameItem>));
     }
 }
 
@@ -189,7 +210,11 @@ pub struct RotationPlugin;
 //Plugin to display the rotation example
 impl Plugin for RotationPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_rotatable_cube)
-            .add_system(rotate_items);
+        app.add_system_set(SystemSet::on_enter(GameState::Game)
+                .with_system(spawn_rotatable_cube))
+            .add_system_set(SystemSet::on_update(GameState::Game)
+                .with_system(rotate_items))
+            .add_system_set(SystemSet::on_exit(GameState::Game)
+                .with_system(despawn::<GameItem>));
     }
 }

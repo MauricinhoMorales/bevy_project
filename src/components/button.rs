@@ -1,10 +1,21 @@
-use crate::{resources::{MyFonts, MyButtons, MyActions}, constants::*};
 use bevy::prelude::*;
+use crate::{
+    tools::{
+        resources::{MyFonts, MyButtons, MyActions},
+        constants::*, 
+        generics::despawn}, 
+    views::{
+        GameState, 
+        game::GameItem}
+    };
 
 #[derive(Component)]
 struct Panel;
 
-//Function to verify the state of a button and change accordingly
+#[derive(Component)]
+struct IconButton;
+
+// Function to verify the state of a button and change accordingly
 // fn button_system(
 //     mut interaction_query: Query<
 //         (&Interaction, &mut UiColor, &Children),
@@ -107,10 +118,12 @@ fn spawn_button_image(mut commands: Commands, button: Res<MyButtons>) {
             },
             image: UiImage(button.play.clone()),
             ..default() 
-        }).insert(Name::new("Icon Button"));
+        }).insert(Name::new("Icon Button"))
+        .insert(IconButton)
+        .insert(GameItem);
 }
 
-// fn spawn_button(mut commands: Commands, font: Res<MediumFont>) {
+// fn spawn_button(mut commands: Commands, fonts: Res<MyFonts>) {
 //     commands
 //         .spawn_bundle(ButtonBundle {
 //             style: Style {
@@ -132,12 +145,13 @@ fn spawn_button_image(mut commands: Commands, button: Res<MyButtons>) {
 //             ..default() 
 //         })
 //         .insert(Name::new("Button"))
+//         .insert(GameItem)
 //         .with_children(|parent| {
 //             parent.spawn_bundle(TextBundle {
 //                 text: Text::from_section(
 //                     "Button",
 //                     TextStyle {
-//                         font: font.0.clone(),
+//                         font: fonts.medium.clone(),
 //                         font_size: 40.0,
 //                         color: Color::rgb(0.9, 0.9, 0.9),
 //                     }
@@ -171,6 +185,7 @@ fn spawn_panel_2d(mut commands: Commands, fonts: Res<MyFonts>) {
         .insert(Name::new("Panel"))
         .insert(Interaction::None)
         .insert(Panel)
+        .insert(GameItem)
         .with_children(|p| {
             p.spawn_bundle(TextBundle {
                 text: Text::from_section(
@@ -190,9 +205,13 @@ pub struct ButtonPlugin;
 
 impl Plugin for ButtonPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_button_image)
-            .add_startup_system(spawn_panel_2d)
-            .add_system(icon_button_system)
-            .add_system(panel_system);
+        app.add_system_set(SystemSet::on_enter(GameState::Game)
+                .with_system(spawn_button_image)
+                .with_system(spawn_panel_2d))
+            .add_system_set(SystemSet::on_update(GameState::Game)
+                .with_system(icon_button_system)
+                .with_system(panel_system))
+            .add_system_set(SystemSet::on_exit(GameState::Game)
+                .with_system(despawn::<GameItem>));
     }
 }

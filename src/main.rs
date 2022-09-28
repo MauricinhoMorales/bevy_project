@@ -1,16 +1,14 @@
+use views::{GameState, DisplayQuality, Volume, splash, menu, game};
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
-use constants::{HEIGHT,WIDTH};
+use tools::constants::{HEIGHT,WIDTH};
 
-mod assets;
-mod button;
-mod camara;
-mod resources;
-mod picking;
-mod text;
-mod window;
-mod constants;
-mod cars;
+mod tools;
+mod components;
+mod views;
+
+#[derive(Component)]
+struct Camera2D;
 
 fn main() {
     App::new()
@@ -21,16 +19,23 @@ fn main() {
             resizable: true,
             ..default()
         })
-        .add_plugin(resources::ResourcesPlugin)
+        .add_plugin(tools::resources::ResourcesPlugin)
         .add_plugins(DefaultPlugins)
-        .add_plugin(resources::FontPlugin)
-        // .add_plugin(window::WindowPlugin)
-        .add_plugin(button::ButtonPlugin)
-        .add_plugin(text::TextPlugin)
-        .add_plugin(camara::PanOrbitCamaraPlugin)
-        .add_plugin(assets::Scene2Plugin)
-        .add_plugin(assets::RotationPlugin)
-        .add_plugin(cars::CarPlugin)
+        .add_plugin(tools::resources::FontPlugin)
+        // Insert as resource the initial value for the settings resources
+        .insert_resource(DisplayQuality::Medium)
+        .insert_resource(Volume(7))
+        .add_startup_system(setup)
+        // Declare the game state, and set its startup value
+        .add_state(GameState::Splash)
+        // Adds the plugins for each state
+        .add_plugin(splash::SplashPlugin)
+        .add_plugin(menu::MenuPlugin)
+        .add_plugin(game::GamePlugin)
         .add_plugin(WorldInspectorPlugin::new())
         .run();
+}
+
+pub fn setup(mut commands: Commands) {
+    commands.spawn_bundle(Camera2dBundle::default()).insert(Camera2D);
 }
