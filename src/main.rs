@@ -1,4 +1,4 @@
-use views::{GameState, DisplayQuality, Volume, splash, menu, game};
+use views::{GameState, Player, Volume, splash, menu, game};
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
 use tools::constants::{HEIGHT,WIDTH};
@@ -23,7 +23,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(tools::resources::FontPlugin)
         // Insert as resource the initial value for the settings resources
-        .insert_resource(DisplayQuality::Medium)
+        .insert_resource(Player::First)
         .insert_resource(Volume(7))
         .add_startup_system(setup)
         // Declare the game state, and set its startup value

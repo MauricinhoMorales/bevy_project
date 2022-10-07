@@ -8,7 +8,9 @@ pub struct MyFonts{
 pub struct MyAssets {
     pub ipfs: Handle<Scene>,
     pub sf: Handle<Scene>,
-    pub car: Handle<Scene>
+    pub car1: Handle<Scene>,
+    pub car2: Handle<Scene>,
+    pub car3: Handle<Scene>,
 }
 
 pub struct MyButtons {
@@ -42,7 +44,9 @@ fn asset_loading(mut commands: Commands, server: Res<AssetServer>){
         MyAssets{
             ipfs: server.load("models/Logo_IPFS.gltf#Scene0"),
             sf: server.load("models/Logo_SugarFunge.gltf#Scene0"),
-            car: server.load("car-models/race.glb#Scene0")
+            car1: server.load("car-models/race.glb#Scene0"),
+            car2: server.load("car-models/ambulance.glb#Scene0"),
+            car3: server.load("car-models/police.glb#Scene0")
         }
     );
 }

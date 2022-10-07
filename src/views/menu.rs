@@ -1,6 +1,6 @@
 use bevy::{app::AppExit, prelude::*};
 use crate::tools::{generics::despawn, resources::MyFonts};
-    use super::{DisplayQuality, GameState, Volume, TEXT_COLOR};
+    use super::{Player, GameState, Volume, TEXT_COLOR};
 
     // This plugin manages the menu, with 5 different screens:
     // - a main menu with "New Game", "Settings", "Quit"
@@ -37,7 +37,7 @@ use crate::tools::{generics::despawn, resources::MyFonts};
                 )
                 .add_system_set(
                     SystemSet::on_update(MenuState::SettingsDisplay)
-                        .with_system(setting_button::<DisplayQuality>),
+                        .with_system(setting_button::<Player>),
                 )
                 .add_system_set(
                     SystemSet::on_exit(MenuState::SettingsDisplay)
@@ -299,7 +299,7 @@ use crate::tools::{generics::despawn, resources::MyFonts};
             .insert(OnSettingsMenuScreen)
             .with_children(|parent| {
                 for (action, text) in [
-                    (MenuButtonAction::SettingsDisplay, "Display"),
+                    (MenuButtonAction::SettingsDisplay, "Player"),
                     (MenuButtonAction::SettingsSound, "Sound"),
                     (MenuButtonAction::BackToMainMenu, "Back"),
                 ] {
@@ -322,7 +322,7 @@ use crate::tools::{generics::despawn, resources::MyFonts};
 
     fn display_settings_menu_setup(
         mut commands: Commands,
-        display_quality: Res<DisplayQuality>,
+        display_player: Res<Player>,
         fonts: Res<MyFonts>
     ) {
         let button_style = Style {
@@ -365,14 +365,14 @@ use crate::tools::{generics::despawn, resources::MyFonts};
                     .with_children(|parent| {
                         // Display a label for the current setting
                         parent.spawn_bundle(TextBundle::from_section(
-                            "Display Quality",
+                            "  Player ",
                             button_text_style.clone(),
                         ));
                         // Display a button for each possible value
-                        for quality_setting in [
-                            DisplayQuality::Low,
-                            DisplayQuality::Medium,
-                            DisplayQuality::High,
+                        for player_setting in [
+                            Player::First,
+                            Player::Second,
+                            Player::Third,
                         ] {
                             let mut entity = parent.spawn_bundle(ButtonBundle {
                                 style: Style {
@@ -382,13 +382,13 @@ use crate::tools::{generics::despawn, resources::MyFonts};
                                 color: NORMAL_BUTTON.into(),
                                 ..default()
                             });
-                            entity.insert(quality_setting).with_children(|parent| {
+                            entity.insert(player_setting).with_children(|parent| {
                                 parent.spawn_bundle(TextBundle::from_section(
-                                    format!("{quality_setting:?}"),
+                                    format!("{player_setting:?}"),
                                     button_text_style.clone(),
                                 ));
                             });
-                            if *display_quality == quality_setting {
+                            if *display_player == player_setting {
                                 entity.insert(SelectedOption);
                             }
                         }

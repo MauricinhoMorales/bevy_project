@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{tools::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, X_SEPARATION, FULL_TURN},resources::{MyAssets, MyActions}, generics::despawn}, views::{GameState, game::GameItem}};
+use crate::{tools::{constants::{X_DEFAULT, Y_DEFAULT, Z_DEFAULT, X_SEPARATION, FULL_TURN},resources::{MyAssets, MyActions}, generics::despawn}, views::{GameState, game::GameItem, Player}};
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
@@ -25,9 +25,9 @@ pub struct Bullet{
 
 
 //Load an .gltf file to be inserted in the world
-pub fn spawn_car(mut commands: Commands, assets: Res<MyAssets>) {
+pub fn spawn_car(mut commands: Commands, player: Res<Player>, assets: Res<MyAssets>) {
     commands.spawn_bundle(SceneBundle {
-        scene: assets.car.clone(),
+        scene: get_car_model(player,assets),
         transform: Transform::from_xyz(X_DEFAULT+5.0*X_SEPARATION,Y_DEFAULT,Z_DEFAULT),
         ..Default::default()
     })
@@ -40,6 +40,14 @@ pub fn spawn_car(mut commands: Commands, assets: Res<MyAssets>) {
         reload_time: Timer::from_seconds(1.0, true),
         shot_available: true
     });
+}
+
+fn get_car_model(player: Res<Player>, assets: Res<MyAssets>)-> Handle<Scene> {
+    match *player{
+        Player::First => return assets.car1.clone(),
+        Player::Second => return assets.car2.clone(),
+        Player::Third => return assets.car3.clone(),
+    }
 }
 
 fn car_interactions(

@@ -15,12 +15,11 @@ pub enum GameState {
     Game,
 }
 
-// One of the two settings that can be set through the menu. It will be a resource in the app
 #[derive(Debug, Component, PartialEq, Eq, Clone, Copy)]
-pub enum DisplayQuality {
-    Low,
-    Medium,
-    High,
+pub enum Player {
+    First,
+    Second,
+    Third,
 }
 
 // One of the two settings that can be set through the menu. It will be a resource in the app
